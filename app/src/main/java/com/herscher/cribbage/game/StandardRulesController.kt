@@ -6,11 +6,11 @@ import java.util.*
 const val MAX_PLAY_COUNT = 31
 
 class StandardRulesController : RulesController {
-    private val playScorer: StandardPlayScorer
+    private val scorer: StandardScorer
     private val cardFactory: CardFactory
 
-    constructor(playScorer: StandardPlayScorer, cardFactory: CardFactory) {
-        this.playScorer = playScorer
+    constructor(scorer: StandardScorer, cardFactory: CardFactory) {
+        this.scorer = scorer
         this.cardFactory = cardFactory
     }
 
@@ -48,7 +48,7 @@ class StandardRulesController : RulesController {
         player.discards.addAll(cards)
 
         // Check to see if all cards are discarded
-        for (p : Player in game.players) {
+        for (p: Player in game.players) {
             if (getRemainingDiscardCount(game, player) > 0) {
                 // Player still needs to discard
                 return
@@ -128,7 +128,7 @@ class StandardRulesController : RulesController {
         var nextPlayerIndex = getNextPlayerWithValidCard(game)
 
         // Score what was just played, including a score for GO if no one else can play
-        val playerScoring = playScorer.calculateScores(game, nextPlayerIndex == game.activePlayerIndex)
+        val playerScoring = scorer.calculatePlayScores(game, nextPlayerIndex == game.activePlayerIndex)
 
         // Apply the scores
         for (s in playerScoring.scores) {
@@ -186,7 +186,7 @@ class StandardRulesController : RulesController {
     private fun handleEndOfRound(game: Game) {
         // Score everything in order, and only add a score after processed in case previous scores
         // win the game. In that case we don't bother scoring the remaining ones.
-        val allScores = getEndOfRoundScores(game)
+        val allScores = scorer.calculateRoundScores(game)
         game.lastEndOfRoundScores.clear()
 
         // Apply each in order
@@ -214,12 +214,6 @@ class StandardRulesController : RulesController {
         game.playedCards.clear()
         game.dealerPlayerIndex = incrementPlayerIndex(game, game.dealerPlayerIndex)
         game.state = GameState.ROUND_START
-    }
-
-    private fun getEndOfRoundScores(game: Game): List<PlayerScoring> {
-        // TODO
-        val allScores: MutableList<PlayerScoring> = ArrayList()
-        return allScores
     }
 
     private fun checkState(game: Game, expectedState: GameState) {

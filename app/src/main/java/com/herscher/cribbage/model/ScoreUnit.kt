@@ -9,7 +9,7 @@ data class ScoreUnit(val cards: List<Card>,
         RUN,
         SET,
         FLUSH,
-        KNOBS,
+        NOBS,
         GO
     }
 }
