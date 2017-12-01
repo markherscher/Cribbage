@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#003518">
+
+    <com.herscher.cribbage.view.HandView
+        android:id="@+id/north_hand_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/game_hand_height"
+        android:orientation="horizontal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="#00FF00" />
+
+    <TextView
+        android:id="@+id/north_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lines="1"
+        android:textSize="12sp"
+        app:layout_constraintTop_toBottomOf="@+id/north_hand_view"
+        tools:background="#00FF00"
+        tools:text="North Player (30)" />
+
+    <TextView
+        android:id="@+id/south_name_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lines="1"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/south_hand_view"
+        tools:background="#00FF00"
+        tools:text="South Player (25)" />
+
+    <com.herscher.cribbage.view.HandView
+        android:id="@+id/south_hand_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/game_hand_height"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:background="#00FF00" />
+
+    <TextView
+        android:id="@+id/west_name_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="12sp"
+        app:layout_constraintEnd_toEndOf="@+id/west_hand_view"
+        app:layout_constraintStart_toStartOf="@+id/west_hand_view"
+        app:layout_constraintTop_toBottomOf="@+id/north_name_text"
+        tools:background="#00AA00"
+        tools:text="West Player (32)" />
+
+    <com.herscher.cribbage.view.HandView
+        android:id="@+id/west_hand_view"
+        android:layout_width="@dimen/game_hand_width"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/south_name_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/west_name_text"
+        tools:background="#00AA00" />
+
+    <com.herscher.cribbage.view.HandView
+        android:id="@+id/east_hand_view"
+        android:layout_width="@dimen/game_hand_width"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/east_name_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/north_name_text"
+        tools:background="#00AA00" />
+
+    <TextView
+        android:id="@+id/east_name_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="12sp"
+        app:layout_constraintBottom_toTopOf="@+id/south_name_text"
+        app:layout_constraintEnd_toEndOf="@+id/east_hand_view"
+        app:layout_constraintStart_toStartOf="@+id/east_hand_view"
+        tools:background="#00AA00"
+        tools:text="East Player (15)" />
+
+    <com.herscher.cribbage.view.HandView
+        android:id="@+id/played_cards_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/instructions_text"
+        app:layout_constraintEnd_toStartOf="@id/east_hand_view"
+        app:layout_constraintStart_toEndOf="@+id/west_hand_view"
+        app:layout_constraintTop_toBottomOf="@+id/play_count_text"
+        tools:background="#005500" />
+
+    <TextView
+        android:id="@+id/play_count_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="5dp"
+        app:layout_constraintEnd_toStartOf="@id/east_hand_view"
+        app:layout_constraintStart_toEndOf="@id/west_hand_view"
+        app:layout_constraintTop_toBottomOf="@+id/north_name_text"
+        tools:text="30" />
+
+    <TextView
+        android:id="@+id/instructions_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:lines="3"
+        android:padding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/south_name_text"
+        app:layout_constraintEnd_toStartOf="@id/east_hand_view"
+        app:layout_constraintStart_toEndOf="@id/west_hand_view"
+        tools:text="Instructions go here" />
+</android.support.constraint.ConstraintLayout>

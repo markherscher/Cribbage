@@ -1,12 +1,12 @@
 package com.herscher.cribbage.model
 
 data class Game(
-        var state: GameState = GameState.ROUND_START,
+        var state: GameState = GameState.NEW,
         val options: Options = Options(),
         val players: List<Player> = emptyList(),
         var playTotal: Int = 0,
+        var cutCard: Card? = null,
         val crib: MutableList<Card> = ArrayList(),
-        var cutCard: Card = Card(),
         var allCards: MutableList<Card> = ArrayList(),
         val playedCards: MutableList<Card> = ArrayList(),
         var dealerPlayerIndex: Int = -1,

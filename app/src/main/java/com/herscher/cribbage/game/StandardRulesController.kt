@@ -21,7 +21,7 @@ class StandardRulesController : RulesController {
     }
 
     override fun isCardValidToPlay(game: Game, player: Player, card: Card): Boolean {
-        return game.playTotal + card.value <= MAX_PLAY_COUNT
+        return player == game.activePlayer && game.playTotal + card.value <= MAX_PLAY_COUNT
     }
 
     override fun getRemainingDiscardCount(game: Game, player: Player): Int {

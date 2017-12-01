@@ -3,9 +3,10 @@ package com.herscher.cribbage.game
 import com.herscher.cribbage.model.*
 
 class GameCenter {
-    val game: Game
-    val rulesController: RulesController
-    val listeners: MutableList<Listener> = ArrayList()
+    private val game: Game
+    private val rulesController: RulesController
+    private val listeners: MutableList<Listener> = ArrayList()
+    private val playerInfoMap: MutableMap<Player, PlayerInfo> = HashMap()
 
     constructor(game: Game, rulesController: RulesController) {
         this.game = game
@@ -98,6 +99,9 @@ class GameCenter {
         }
 
         when (game.state) {
+            GameState.NEW -> {
+                // Shouldn't happen?
+            }
             GameState.PLAY -> {
                 for (l in listeners) {
                     l.onPlayRequired(game.players[game.activePlayerIndex])
@@ -125,6 +129,32 @@ class GameCenter {
         return rulesController.isCardValidToPlay(game, player, card)
     }
 
+    fun setPlayerInfo(player: Player, playerInfo: PlayerInfo?) {
+        if (!game.players.contains(player)) {
+            throw IllegalArgumentException("player is not in game")
+        }
+
+        if (playerInfo != null) {
+            playerInfoMap.put(player, playerInfo)
+        } else {
+            playerInfoMap.remove(player)
+        }
+    }
+
+    fun getPlayerInfo(player: Player): PlayerInfo {
+        val playerInfo = playerInfoMap.get(player)
+        if (playerInfo == null) {
+            throw IllegalArgumentException("player not found")
+        }
+
+        return playerInfo
+    }
+
+    val arePlayersReady: Boolean
+        get() {
+            return playerInfoMap.size == game.players.size
+        }
+
     val gameState: GameState
         get() {
             return game.state
@@ -145,7 +175,7 @@ class GameCenter {
             return game.crib
         }
 
-    val cutCard: Card
+    val cutCard: Card?
         get() {
             return game.cutCard
         }
@@ -185,4 +215,6 @@ class GameCenter {
 
         fun onGameComplete()
     }
+
+    class PlayerInfo(val name: String, val isLocal: Boolean)
 }
