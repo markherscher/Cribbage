@@ -19,6 +19,7 @@ class CardFrontView : LinearLayout {
 
     var card: Card? = null
         set(value) {
+            field = value
             suit_image.setImageResource(when (card?.suit) {
                 Suit.CLUBS -> R.drawable.card_club
                 Suit.DIAMONDS -> R.drawable.card_diamond

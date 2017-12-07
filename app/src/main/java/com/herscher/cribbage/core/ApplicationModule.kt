@@ -25,6 +25,8 @@ class ApplicationModule(private val app: CribbageApplication) {
                 playerList)
 
         gameCenter = GameCenter(game, StandardRulesController(StandardScorer(), StandardCardFactory()))
+        gameCenter.setPlayerInfo(playerList[0], GameCenter.PlayerInfo("Mark", true))
+        gameCenter.setPlayerInfo(playerList[1], GameCenter.PlayerInfo("Bob", true))
     }
 
     @Provides

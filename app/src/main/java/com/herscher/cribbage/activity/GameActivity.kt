@@ -53,7 +53,9 @@ class GameActivity : BaseActivity() {
         }
 
         isHotseatPlay = localPlayerCount > 1
+        played_cards_view.isFacedown = false
 
+        gameCenter.resumeGame() // tODO why both here?
         initGame()
     }
 
@@ -70,8 +72,8 @@ class GameActivity : BaseActivity() {
 
     override fun onPositiveChoice(fragment: SimpleMessageDialogFragment) {
         if (instanceData.hideCards) {
+            showActivePlayerHand()
             instanceData.hideCards = false
-            attemptToShowActivePlayerHand()
         }
     }
 
@@ -114,20 +116,21 @@ class GameActivity : BaseActivity() {
         }
 
         // Show all players' data
-        for (slot in playerSlots.values) {
-            slot.nameView.text = String.format("%s (%d)", gameCenter.getPlayerInfo(slot.player).name, slot.player.score)
+        /*for (slot in playerSlots.values) {
             slot.handView.removeAllCards()
             slot.handView.listener = HandViewListener(slot.player)
             for (card in slot.player.hand) {
                 slot.handView.addCard(card)
             }
-        }
+            updateScore(slot.player)
+        }*/
 
         play_count_text.text = String.format("Count: %d", gameCenter.playTotal)
-        updatePlayerAreas()
+        showActivePlayer()
+        //attemptToShowActivePlayerHand()
     }
 
-    private fun updatePlayerAreas() {
+    private fun showActivePlayer() {
         // TODO: show status/what is being waited on
         val showPlayerAsActive: Boolean
 
@@ -138,11 +141,9 @@ class GameActivity : BaseActivity() {
             }
             GameState.LEAD -> {
                 showPlayerAsActive = true
-
             }
             GameState.PLAY -> {
                 showPlayerAsActive = true
-
             }
             else -> {
                 showPlayerAsActive = false
@@ -158,6 +159,14 @@ class GameActivity : BaseActivity() {
                 slot.nameView.setTextColor(
                         ContextCompat.getColor(this, R.color.inactivePlayerText))
             }
+        }
+    }
+
+    private fun updateScore(player: Player) {
+        val slot = playerSlots[player]
+        if (slot != null) {
+            slot.nameView.text = String.format("%s (%d)",
+                    gameCenter.getPlayerInfo(player).name, player.score)
         }
     }
 
@@ -183,7 +192,7 @@ class GameActivity : BaseActivity() {
         val playerInfo = gameCenter.getPlayerInfo(gameCenter.activePlayer)
         hideAllPlayerHands()
 
-        // If the current player's cards are hidden and we're in hotseat play: don't show yet
+        // If the current player's cards are hidden and we're in hot seat play: don't show yet
         if (playerInfo.isLocal) {
             if (playerSlots[gameCenter.activePlayer]?.handView?.isFacedown == true && isHotseatPlay) {
                 if (!instanceData.hideCards) {
@@ -198,25 +207,42 @@ class GameActivity : BaseActivity() {
 
     private inner class GameListener : GameCenter.Listener {
         override fun onCardsDiscarded(player: Player, cards: Array<Card>) {
-            // TODO
+            for (c in cards) {
+                playerSlots[player]?.handView?.removeCard(c)
+            }
         }
 
         override fun onCardLead(player: Player, card: Card) {
+            playerSlots[player]?.handView?.removeCard(card)
             played_cards_view.addCard(card)
         }
 
         override fun onCardPlayed(player: Player, card: Card, scores: PlayerScoring) {
-            // TODO: update displayed scores
+            playerSlots[player]?.handView?.removeCard(card)
             played_cards_view.addCard(card)
+            updateScore(player)
         }
 
         override fun onRoundStart() {
             played_cards_view.removeAllCards()
             showInstructions("New round started; please discard cards")
+
+            for (slot in playerSlots.values) {
+                slot.handView.removeAllCards()
+                slot.handView.listener = HandViewListener(slot.player)
+                for (card in slot.player.hand) {
+                    slot.handView.addCard(card)
+                }
+                updateScore(slot.player)
+            }
+
+            // Show all cards for now TODO temporary until I can figure out how to discard hotseat
+            for (slot in playerSlots.values) {
+                slot.handView.isFacedown = !gameCenter.getPlayerInfo(slot.player).isLocal
+            }
         }
 
         override fun onLeadRequired(player: Player) {
-            // TODO: update active player
             played_cards_view.removeAllCards()
             showInstructions(String.format("Waiting for %s to lead a card",
                     gameCenter.getPlayerInfo(player).name))
@@ -224,7 +250,6 @@ class GameActivity : BaseActivity() {
         }
 
         override fun onPlayRequired(player: Player) {
-            // TODO: update active player
             showInstructions(String.format("Waiting for %s to play a card",
                     gameCenter.getPlayerInfo(player).name))
             attemptToShowActivePlayerHand()

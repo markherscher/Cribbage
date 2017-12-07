@@ -16,6 +16,7 @@ class StandardRulesController : RulesController {
 
     override fun startNewGameIfNeeded(game: Game) {
         if (game.state == GameState.NEW) {
+            game.allCards = cardFactory.createStandardDeck()
             startRound(game)
         }
     }
@@ -32,7 +33,7 @@ class StandardRulesController : RulesController {
         checkState(game, GameState.ROUND_START)
 
         // Ensure the amount of cards to discard is legal
-        if (getRemainingDiscardCount(game, player) > cards.size) {
+        if (getRemainingDiscardCount(game, player) < cards.size) {
             throw RulesViolationException(RulesViolationException.RuleViolation.DISCARD_COUNT_WRONG)
         }
 
@@ -48,15 +49,14 @@ class StandardRulesController : RulesController {
         player.discards.addAll(cards)
 
         // Check to see if all cards are discarded
-        for (p: Player in game.players) {
-            if (getRemainingDiscardCount(game, player) > 0) {
+        for (p in game.players) {
+            if (getRemainingDiscardCount(game, p) > 0) {
                 // Player still needs to discard
                 return
             }
         }
 
         // If we get this far then everyone has discarded
-        game.activePlayerIndex = incrementPlayerIndex(game, game.dealerPlayerIndex)
         game.state = GameState.LEAD
     }
 
@@ -213,7 +213,22 @@ class StandardRulesController : RulesController {
         game.playTotal = 0
         game.playedCards.clear()
         game.dealerPlayerIndex = incrementPlayerIndex(game, game.dealerPlayerIndex)
+        game.activePlayerIndex = incrementPlayerIndex(game, game.dealerPlayerIndex)
         game.state = GameState.ROUND_START
+
+
+        // Deal the cards
+        val handSize = game.options.discardCount + game.options.playCount
+        var cardIndex = 0
+        for (player in game.players) {
+
+            for (i in 0 until handSize) {
+                player.hand.add(game.allCards[cardIndex])
+                cardIndex++
+            }
+        }
+
+        game.cutCard = game.allCards[cardIndex]
     }
 
     private fun checkState(game: Game, expectedState: GameState) {

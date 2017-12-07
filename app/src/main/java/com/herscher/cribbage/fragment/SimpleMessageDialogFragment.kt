@@ -53,15 +53,9 @@ class SimpleMessageDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
         isCancelable = false
 
-        if (savedInstanceState != null) {
-            mMessage = savedInstanceState.getString(MESSAGE_KEY)
-            mTitle = savedInstanceState.getString(TITLE_KEY)
-            mCallbackEnabled = savedInstanceState.getBoolean(CALLBACK_ENABLED)
-        } else if (arguments != null) {
-            mMessage = arguments.getString(MESSAGE_KEY)
-            mTitle = arguments.getString(TITLE_KEY)
-            mCallbackEnabled = arguments.getBoolean(CALLBACK_ENABLED)
-        }
+        mMessage = arguments.getString(MESSAGE_KEY)
+        mTitle = arguments.getString(TITLE_KEY)
+        mCallbackEnabled = arguments.getBoolean(CALLBACK_ENABLED)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -84,7 +78,7 @@ class SimpleMessageDialogFragment : DialogFragment() {
         mCallback = null
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle): Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val builder = AlertDialog.Builder(activity)
 
         if (mTitle != null) {

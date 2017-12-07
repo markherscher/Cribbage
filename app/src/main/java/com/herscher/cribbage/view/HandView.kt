@@ -21,6 +21,7 @@ class HandView : LinearLayout {
 
     var isFacedown: Boolean = true
         set(value) {
+            field = value
             val allChildren = (0..getChildCount() - 1).map { getChildAt(it) }
 
             for (v in allChildren) {
@@ -38,6 +39,7 @@ class HandView : LinearLayout {
     fun addCard(card: Card) {
         val cardView = CardView(context)
         cardView.card = card
+        cardView.isFacedown = isFacedown
         cardView.setOnClickListener(clickHandler)
         addView(cardView)
     }

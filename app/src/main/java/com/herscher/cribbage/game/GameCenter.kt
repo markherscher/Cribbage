@@ -131,7 +131,7 @@ class GameCenter {
 
     fun setPlayerInfo(player: Player, playerInfo: PlayerInfo?) {
         if (!game.players.contains(player)) {
-            throw IllegalArgumentException("player is not in game")
+            throw IllegalArgumentException("no PlayerInfo for specified player")
         }
 
         if (playerInfo != null) {
@@ -142,7 +142,7 @@ class GameCenter {
     }
 
     fun getPlayerInfo(player: Player): PlayerInfo {
-        val playerInfo = playerInfoMap.get(player)
+        val playerInfo = playerInfoMap[player]
         if (playerInfo == null) {
             throw IllegalArgumentException("player not found")
         }

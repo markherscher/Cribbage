@@ -64,7 +64,7 @@ open class StandardScorer : Scorer {
             scoreUnits.addAll(roundScoreFifteens(sortedCards))
             scoreUnits.addAll(roundScorePairs(sortedCards))
             scoreUnits.addAll(roundScoreRuns(sortedCards))
-            scoreUnits.addAll(roundScoreFlush(game.players[playerIndex].hand, game.cutCard, false))
+            scoreUnits.addAll(roundScoreFlush(game.players[playerIndex].hand, game.cutCard!!, false))
             playerScoringList.add(PlayerScoring(playerIndex, scoreUnits))
 
             playerIndex = incrementPlayerIndex(game, playerIndex)
@@ -79,7 +79,7 @@ open class StandardScorer : Scorer {
         scoreUnits.addAll(roundScoreFifteens(sortedCards))
         scoreUnits.addAll(roundScorePairs(sortedCards))
         scoreUnits.addAll(roundScoreRuns(sortedCards))
-        scoreUnits.addAll(roundScoreFlush(game.crib, game.cutCard, true))
+        scoreUnits.addAll(roundScoreFlush(game.crib, game.cutCard!!, true))
         playerScoringList.add(PlayerScoring(game.dealerPlayerIndex, scoreUnits))
 
         return playerScoringList
@@ -99,7 +99,7 @@ open class StandardScorer : Scorer {
                 break
             }
 
-            index++
+            index--
         }
 
         return null

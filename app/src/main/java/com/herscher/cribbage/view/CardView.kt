@@ -19,11 +19,13 @@ class CardView : FrameLayout {
 
     var isHighlighted: Boolean = false
         set(value) {
+            field = value
             updateBackground()
         }
 
     var isFacedown: Boolean = true
         set(value) {
+            field = value
             updateBackground()
         }
 
@@ -45,7 +47,7 @@ class CardView : FrameLayout {
             setBackgroundColor(Color.YELLOW)
         } else {
             card_front_view.visibility = View.VISIBLE
-            setBackgroundColor(Color.TRANSPARENT)
+            setBackgroundColor(Color.WHITE)
         }
     }
 }

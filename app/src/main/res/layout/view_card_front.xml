@@ -7,8 +7,8 @@
 
     <ImageView
         android:id="@+id/suit_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_gravity="center_vertical"
         tools:src="@drawable/card_club" />
 
@@ -17,7 +17,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:textSize="80sp"
+        android:textSize="35sp"
         android:textStyle="bold"
         tools:text="K"
         tools:textColor="#000000" />
