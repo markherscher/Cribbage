@@ -10,10 +10,12 @@ import kotlinx.android.synthetic.main.view_score_unit.view.*
 open class ScoreUnitView : ConstraintLayout {
     constructor(context: Context) : super(context, null) {
         View.inflate(context, R.layout.view_score_unit, this)
+        cards_view.isFacedown = false
     }
 
     var scoreUnit: ScoreUnit? = null
         set(value) {
+            field = value
             if (value == null ) {
                 type_text.text = ""
                 value_text.text = ""

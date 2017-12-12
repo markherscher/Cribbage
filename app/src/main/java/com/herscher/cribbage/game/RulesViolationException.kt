@@ -15,4 +15,16 @@ class RulesViolationException : Exception {
     }
 
     val violation: RuleViolation
+
+    override val message: String?
+        get() {
+            return when (violation) {
+                RuleViolation.INVALID_CARD -> "invalid card"
+                RuleViolation.WRONG_PLAYER -> "wrong player"
+                RuleViolation.STATE_MISMATCH -> "state mismatch"
+                RuleViolation.CARD_CANNOT_BE_PLAYED -> "card cannot be played"
+                RuleViolation.SCORE_DISAGREEMENT -> "score disagreement"
+                RuleViolation.DISCARD_COUNT_WRONG -> "discard count wrong"
+            }
+        }
 }

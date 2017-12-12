@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.TextView
 import com.herscher.cribbage.R
 import com.herscher.cribbage.core.CribbageApplication
+import com.herscher.cribbage.fragment.RoundScoreDialogFragment
 import com.herscher.cribbage.fragment.SimpleMessageDialogFragment
 import com.herscher.cribbage.game.GameCenter
 import com.herscher.cribbage.model.Card
@@ -125,10 +126,12 @@ class GameActivity : BaseActivity() {
             updateScore(slot.player)
         }*/
 
-        play_count_text.text = String.format("Count: %d", gameCenter.playTotal)
         showActivePlayer()
+        updatePlayCount()
         //attemptToShowActivePlayerHand()
     }
+
+    // TODO MARK: restore leadCard ability
 
     private fun showActivePlayer() {
         // TODO: show status/what is being waited on
@@ -170,6 +173,10 @@ class GameActivity : BaseActivity() {
         }
     }
 
+    private fun updatePlayCount() {
+        play_count_text.text = String.format("Count: %d", gameCenter.playTotal)
+    }
+
     private fun hideAllPlayerHands() {
         for (slot in playerSlots.values) {
             slot.handView.isFacedown = true
@@ -197,7 +204,8 @@ class GameActivity : BaseActivity() {
             if (playerSlots[gameCenter.activePlayer]?.handView?.isFacedown == true && isHotseatPlay) {
                 if (!instanceData.hideCards) {
                     instanceData.hideCards = true
-                    showMessage("Next Player", "Pass to the next player and hit OK when ready.")
+                    showMessage("Next Player",
+                            String.format("Pass to %s and hit OK when ready.", playerInfo.name))
                 }
             } else {
                 showActivePlayerHand()
@@ -212,18 +220,30 @@ class GameActivity : BaseActivity() {
             }
         }
 
-        override fun onCardLead(player: Player, card: Card) {
+        override fun onCardLead(player: Player, card: Card, scores: PlayerScoring) {
             playerSlots[player]?.handView?.removeCard(card)
             played_cards_view.addCard(card)
+            updateScore(player)
+            updatePlayCount()
         }
 
         override fun onCardPlayed(player: Player, card: Card, scores: PlayerScoring) {
             playerSlots[player]?.handView?.removeCard(card)
             played_cards_view.addCard(card)
             updateScore(player)
+            updatePlayCount()
+
+            if (scores.scores.isNotEmpty()) {
+                Snackbar.make(played_cards_view, "Points were scored", Snackbar.LENGTH_SHORT).show()
+            }
         }
 
         override fun onRoundStart() {
+            if (gameCenter.lastRoundScores != null &&
+                    fragmentManager.findFragmentByTag(RoundScoreDialogFragment.TAG) == null) {
+                RoundScoreDialogFragment.newInstance().show(fragmentManager, RoundScoreDialogFragment.TAG)
+            }
+
             played_cards_view.removeAllCards()
             showInstructions("New round started; please discard cards")
 
@@ -236,7 +256,7 @@ class GameActivity : BaseActivity() {
                 updateScore(slot.player)
             }
 
-            // Show all cards for now TODO temporary until I can figure out how to discard hotseat
+            // Show all cards for now TODO temporary until I can figure out how to discard hot seat
             for (slot in playerSlots.values) {
                 slot.handView.isFacedown = !gameCenter.getPlayerInfo(slot.player).isLocal
             }
@@ -292,9 +312,7 @@ class GameActivity : BaseActivity() {
                     }
                 }
                 GameState.LEAD -> {
-                    if (player == gameCenter.activePlayer) {
-                        gameCenter.leadCard(player, card)
-                    }
+                    gameCenter.leadCard(player, card)
                 }
                 GameState.PLAY -> {
                     if (gameCenter.isCardValidToPlay(player, card)) {

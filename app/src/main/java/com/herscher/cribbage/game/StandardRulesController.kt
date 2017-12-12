@@ -2,6 +2,7 @@ package com.herscher.cribbage.game
 
 import com.herscher.cribbage.model.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 const val MAX_PLAY_COUNT = 31
 
@@ -22,7 +23,7 @@ class StandardRulesController : RulesController {
     }
 
     override fun isCardValidToPlay(game: Game, player: Player, card: Card): Boolean {
-        return player == game.activePlayer && game.playTotal + card.value <= MAX_PLAY_COUNT
+        return game.playTotal + card.value <= MAX_PLAY_COUNT
     }
 
     override fun getRemainingDiscardCount(game: Game, player: Player): Int {
@@ -60,20 +61,20 @@ class StandardRulesController : RulesController {
         game.state = GameState.LEAD
     }
 
-    override fun leadCard(game: Game, player: Player, card: Card) {
+    override fun leadCard(game: Game, player: Player, card: Card, allowChanges: Boolean): PlayerScoring {
         checkState(game, GameState.LEAD)
 
         if (game.players[game.activePlayerIndex] != player) {
             throw RulesViolationException(RulesViolationException.RuleViolation.WRONG_PLAYER)
         }
 
-        checkCardsOwned(player, Array(1) { card })
+        return handleCardPlayed(game, player, card)
+    }
 
-        game.playedCards.add(card)
-        player.hand.remove(card)
-        player.played.add(card)
-        game.state = GameState.PLAY
-        game.activePlayerIndex = incrementPlayerIndex(game, game.activePlayerIndex)
+    override fun playCard(game: Game, player: Player, card: Card, allowChanges: Boolean): PlayerScoring {
+        checkState(game, GameState.PLAY)
+
+        return handleCardPlayed(game, player, card)
     }
 
     private fun getNextPlayerWithValidCard(game: Game): Int {
@@ -82,7 +83,7 @@ class StandardRulesController : RulesController {
         do {
             currentIndex = incrementPlayerIndex(game, currentIndex)
 
-            for (c: Card in game.players[currentIndex].hand) {
+            for (c in game.players[currentIndex].hand) {
                 if (isCardValidToPlay(game, game.players[currentIndex], c)) {
                     return currentIndex
                 }
@@ -92,23 +93,7 @@ class StandardRulesController : RulesController {
         return -1
     }
 
-    private fun getNextPlayerWithAnyCards(game: Game): Int {
-        val startingPlayerIndex: Int = game.activePlayerIndex
-        var currentIndex = startingPlayerIndex
-        do {
-            currentIndex = incrementPlayerIndex(game, currentIndex)
-
-            if (game.players[currentIndex].hand.size > 0) {
-                return currentIndex
-            }
-        } while (startingPlayerIndex != currentIndex)
-
-        return -1
-    }
-
-    override fun playCard(game: Game, player: Player, card: Card, allowChanges: Boolean): PlayerScoring {
-        checkState(game, GameState.PLAY)
-
+    private fun handleCardPlayed(game: Game, player: Player, card: Card): PlayerScoring {
         if (game.players[game.activePlayerIndex] != player) {
             throw RulesViolationException(RulesViolationException.RuleViolation.WRONG_PLAYER)
         }
@@ -120,6 +105,7 @@ class StandardRulesController : RulesController {
         }
 
         game.playedCards.add(card)
+        game.playTotal += card.value
         player.hand.remove(card)
         player.played.add(card)
 
@@ -146,6 +132,7 @@ class StandardRulesController : RulesController {
         if (nextPlayerIndex >= 0) {
             // Great, we have our player
             game.activePlayerIndex = nextPlayerIndex
+            game.state = GameState.PLAY
         } else {
             // No valid cards left for anyone; check if there's anyone left to lead
             game.playTotal = 0
@@ -161,6 +148,20 @@ class StandardRulesController : RulesController {
         }
 
         return playerScoring
+    }
+
+    private fun getNextPlayerWithAnyCards(game: Game): Int {
+        val startingPlayerIndex: Int = game.activePlayerIndex
+        var currentIndex = startingPlayerIndex
+        do {
+            currentIndex = incrementPlayerIndex(game, currentIndex)
+
+            if (game.players[currentIndex].hand.size > 0) {
+                return currentIndex
+            }
+        } while (startingPlayerIndex != currentIndex)
+
+        return -1
     }
 
     override fun getTeamNumber(game: Game, player: Player): Int {
@@ -187,7 +188,7 @@ class StandardRulesController : RulesController {
         // Score everything in order, and only add a score after processed in case previous scores
         // win the game. In that case we don't bother scoring the remaining ones.
         val allScores = scorer.calculateRoundScores(game)
-        game.lastEndOfRoundScores.clear()
+        game.lastEndOfRoundScores = ArrayList()
 
         // Apply each in order
         for (scoring in allScores) {
@@ -196,7 +197,7 @@ class StandardRulesController : RulesController {
                 player.score += s.points
             }
 
-            game.lastEndOfRoundScores.add(scoring)
+            game.lastEndOfRoundScores?.add(scoring)
 
             if (checkForEndOfGame(game, player)) {
                 break
@@ -221,6 +222,7 @@ class StandardRulesController : RulesController {
         val handSize = game.options.discardCount + game.options.playCount
         var cardIndex = 0
         for (player in game.players) {
+            player.discards.clear()
 
             for (i in 0 until handSize) {
                 player.hand.add(game.allCards[cardIndex])

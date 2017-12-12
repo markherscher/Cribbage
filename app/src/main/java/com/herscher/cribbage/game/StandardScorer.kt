@@ -57,7 +57,7 @@ open class StandardScorer : Scorer {
             val scoreUnits = ArrayList<ScoreUnit>()
 
             // Sort the player's hands adding the cut card to it
-            val allCards = ArrayList(game.players[playerIndex].hand)
+            val allCards = ArrayList(game.players[playerIndex].played)
             allCards.add(game.cutCard)
             val sortedCards = allCards.sortedWith(compareBy { it.order })
 
@@ -175,16 +175,17 @@ open class StandardScorer : Scorer {
                 var indexToAdd = baseIndex
                 val includedCards = ArrayList<Card>()
                 var total = sortedCards[i].value
+                includedCards.add(sortedCards[i])
 
                 while (indexToAdd < sortedCards.size) {
                     total += sortedCards[indexToAdd].value
                     includedCards.add(sortedCards[indexToAdd])
 
-                    if (total == FIFTEENS) {
+                    if (total > FIFTEENS) { // tODO
                         scoreUnitList.add(ScoreUnit(ArrayList(includedCards),
                                 POINTS_PER_FIFTEENS, ScoreUnit.Type.FIFTEENS))
                         break
-                    } else if (total > FIFTEENS) {
+                    } else if (total == FIFTEENS) { // TODO
                         break
                     }
 
@@ -302,7 +303,7 @@ open class StandardScorer : Scorer {
         // Sorted by value
         for (i in sortedCards.indices) {
             if (sortedCards[i].value != lastValue) {
-                val cardsInvolved: List<Card> = sortedCards.subList(i - repeatCount, repeatCount)
+                val cardsInvolved: List<Card> = sortedCards.subList(i - repeatCount, i)
 
                 when (repeatCount) {
                     2 -> scoreUnitList.add(ScoreUnit(cardsInvolved, POINTS_PER_2_SET, ScoreUnit.Type.SET))

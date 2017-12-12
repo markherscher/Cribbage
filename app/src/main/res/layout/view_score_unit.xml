@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#0000ff"
     android:padding="5dp">
 
     <TextView
@@ -15,6 +16,7 @@
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:background="#00FF00"
         tools:text="16 points" />
 
     <TextView
@@ -43,6 +45,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/guideline"
         app:layout_constraintTop_toTopOf="parent"
-        tools:background="#AAAAAA" />
+        android:background="#FF0000" />
 
 </android.support.constraint.ConstraintLayout>

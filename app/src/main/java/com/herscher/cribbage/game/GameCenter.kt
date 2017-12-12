@@ -25,36 +25,7 @@ class GameCenter {
 
     fun resumeGame() {
         rulesController.startNewGameIfNeeded(game)
-
-        when (game.state) {
-            GameState.ROUND_START -> {
-                for (l in listeners) {
-                    l.onRoundStart()
-                }
-            }
-
-            GameState.LEAD -> {
-                for (l in listeners) {
-                    l.onLeadRequired(game.activePlayer)
-                }
-            }
-
-            GameState.PLAY -> {
-                for (l in listeners) {
-                    l.onPlayRequired(game.activePlayer)
-                }
-            }
-
-            GameState.COMPLETE -> {
-                for (l in listeners) {
-                    l.onGameComplete()
-                }
-            }
-
-            else -> {
-                throw IllegalStateException("unhandled game state")
-            }
-        }
+        fireStateListeners()
     }
 
     fun getRemainingDiscardCount(player: Player): Int {
@@ -77,25 +48,10 @@ class GameCenter {
     }
 
     fun leadCard(player: Player, card: Card) {
-        rulesController.leadCard(game, player, card)
+        val playerScore = rulesController.leadCard(game, player, card)
 
         for (l in listeners) {
-            l.onCardLead(player, card)
-        }
-
-        if (game.state == GameState.PLAY) {
-            // State just switched
-            for (l in listeners) {
-                l.onPlayRequired(game.players[game.activePlayerIndex])
-            }
-        }
-    }
-
-    fun playCard(player: Player, card: Card, allowChanges: Boolean) {
-        val playerScoring = rulesController.playCard(game, player, card, allowChanges)
-
-        for (l in listeners) {
-            l.onCardPlayed(player, card, playerScoring)
+            l.onCardLead(player, card, playerScore)
         }
 
         when (game.state) {
@@ -123,6 +79,16 @@ class GameCenter {
                 }
             }
         }
+    }
+
+    fun playCard(player: Player, card: Card, allowChanges: Boolean) {
+        val playerScoring = rulesController.playCard(game, player, card, allowChanges)
+
+        for (l in listeners) {
+            l.onCardPlayed(player, card, playerScoring)
+        }
+
+        fireStateListeners()
     }
 
     fun isCardValidToPlay(player: Player, card: Card): Boolean {
@@ -200,10 +166,41 @@ class GameCenter {
             return game.winningTeamNumber
         }
 
+    val lastRoundScores: List<PlayerScoring>?
+        get() = game.lastEndOfRoundScores
+
+    private fun fireStateListeners() {
+        when (game.state) {
+            GameState.NEW -> {
+                // Shouldn't happen?
+            }
+            GameState.PLAY -> {
+                for (l in listeners) {
+                    l.onPlayRequired(game.players[game.activePlayerIndex])
+                }
+            }
+            GameState.LEAD -> {
+                for (l in listeners) {
+                    l.onLeadRequired(game.players[game.activePlayerIndex])
+                }
+            }
+            GameState.ROUND_START -> {
+                for (l in listeners) {
+                    l.onRoundStart()
+                }
+            }
+            GameState.COMPLETE -> {
+                for (l in listeners) {
+                    l.onGameComplete()
+                }
+            }
+        }
+    }
+
     interface Listener {
         fun onCardsDiscarded(player: Player, cards: Array<Card>)
 
-        fun onCardLead(player: Player, card: Card)
+        fun onCardLead(player: Player, card: Card, scores: PlayerScoring)
 
         fun onCardPlayed(player: Player, card: Card, scores: PlayerScoring)
 

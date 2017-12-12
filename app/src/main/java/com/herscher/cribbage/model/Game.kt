@@ -12,7 +12,7 @@ data class Game(
         var dealerPlayerIndex: Int = -1,
         var activePlayerIndex: Int = -1,
         var winningTeamNumber: Int? = null,
-        val lastEndOfRoundScores: MutableList<PlayerScoring> = ArrayList()) {
+        var lastEndOfRoundScores: MutableList<PlayerScoring>? = null) {
 
     val activePlayer: Player
         get() {

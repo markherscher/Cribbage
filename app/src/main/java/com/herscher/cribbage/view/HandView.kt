@@ -37,11 +37,20 @@ class HandView : LinearLayout {
     private val clickHandler = ClickHandler()
 
     fun addCard(card: Card) {
+        val layoutParams: LinearLayout.LayoutParams
+        if (orientation == LinearLayout.VERTICAL) {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT)
+        } else {
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT)
+        }
+
         val cardView = CardView(context)
         cardView.card = card
         cardView.isFacedown = isFacedown
         cardView.setOnClickListener(clickHandler)
-        addView(cardView)
+        addView(cardView, layoutParams)
     }
 
     fun removeCard(card: Card) {
@@ -66,7 +75,7 @@ class HandView : LinearLayout {
         val allChildren = (0..getChildCount() - 1).map { getChildAt(it) }
 
         for (v in allChildren) {
-            if (v is CardFrontView) {
+            if (v is CardView) {
                 v.card = null
                 v.setOnClickListener(null)
                 removeView(v)

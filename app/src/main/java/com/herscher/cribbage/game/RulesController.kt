@@ -11,7 +11,7 @@ interface RulesController {
 
     fun discardCards(game: Game, player: Player, cards: Array<Card>)
 
-    fun leadCard(game: Game, player: Player, card: Card)
+    fun leadCard(game: Game, player: Player, card: Card, allowChanges: Boolean = true): PlayerScoring
 
     fun playCard(game: Game, player: Player, card: Card, allowChanges: Boolean = true): PlayerScoring
 

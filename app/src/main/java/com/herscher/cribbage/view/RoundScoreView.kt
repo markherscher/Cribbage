@@ -10,19 +10,25 @@ import android.view.View
 import android.view.ViewGroup
 import com.herscher.cribbage.R
 import com.herscher.cribbage.model.ScoreUnit
-import kotlinx.android.synthetic.main.view_end_round_scoring.view.*
+import kotlinx.android.synthetic.main.view_round_score.view.*
 
-class EndRoundScoringView : ConstraintLayout {
+class RoundScoreView : ConstraintLayout {
     private val adapter = RecyclerViewAdapter()
 
     constructor(context: Context?) : this(context, null)
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
-        View.inflate(context, R.layout.view_end_round_scoring, this)
+        View.inflate(context, R.layout.view_round_score, this)
 
         score_recycler.adapter = adapter
         score_recycler.layoutManager = LinearLayoutManager(context)
     }
+
+    var playerName: String = ""
+        set(value) {
+            field = value
+            title.text = value
+        }
 
     var scoreUnits: List<ScoreUnit>?
         set(value) {
@@ -31,22 +37,12 @@ class EndRoundScoringView : ConstraintLayout {
         }
         get() = adapter.scoreUnits
 
-    private inner class ScoreUnitViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(
-                    R.layout.view_score_unit, parent, false)) {
+    private inner class ScoreUnitViewHolder(val scoreUnitView: ScoreUnitView) : RecyclerView.ViewHolder(scoreUnitView) {
         var scoreUnit: ScoreUnit?
             set(value) {
-                if (itemView is ScoreUnitView) {
-                    itemView.scoreUnit = value
-                }
+                scoreUnitView.scoreUnit = value
             }
-            get() {
-                return if (itemView is ScoreUnitView) {
-                    itemView.scoreUnit
-                } else {
-                    null
-                }
-            }
+            get() = scoreUnitView.scoreUnit
     }
 
     private inner class RecyclerViewAdapter : RecyclerView.Adapter<ScoreUnitViewHolder>() {
@@ -58,7 +54,17 @@ class EndRoundScoringView : ConstraintLayout {
 
         override fun getItemCount(): Int = scoreUnits?.size ?: 0
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ScoreUnitViewHolder = ScoreUnitViewHolder(parent!!)
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ScoreUnitViewHolder {
+            val context = parent!!.context
+            val view = ScoreUnitView(context)
+
+            // FUCKING PIECE OF SHIT RECYCLERVIEW MUST BE TOLD TO USE THE CORRECT WIDTH BECAUSE
+            // IT'S FUCKING BUGGY AS SHIT
+            view.layoutParams = RecyclerView.LayoutParams((parent as RecyclerView).layoutManager.width,
+                    RecyclerView.LayoutParams.WRAP_CONTENT)
+
+            return ScoreUnitViewHolder(view)
+        }
 
     }
 }
