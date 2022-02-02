@@ -16,12 +16,8 @@ jobs:
           title="${{github.event.pull_request}}"
           echo "PR is $title"
 
-          echo "Event path: $GITHUB_EVENT_PATH"
-
-          #pull_number=$(jq --raw-output "$GITHUB_EVENT_PATH")
-          #echo "PR number is $pull_number"
-          echo "Github event path:"
-          cat "$GITHUB_EVENT_PATH"
+          pull_number=$(jq --raw-output .issue.number "$GITHUB_EVENT_PATH")
+          echo "PR number is $pull_number"
 
           # Get jira id
           id=$(curl -X GET -u ${{secrets.JIRA_EMAIL}}:${{secrets.JIRA_COOKIE}} https://owletcare.atlassian.net/rest/api/3/issue/${{github.event.inputs.issueKey}}?fields=id | jq -r .id)
