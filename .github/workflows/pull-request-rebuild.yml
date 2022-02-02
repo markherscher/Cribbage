@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Rebuild PR
         run: |
-          title="${{github.event.pull_request.number}}"
+          title="${{github.event.pull_request}}"
           echo "PR is $title"
 
           pull_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
