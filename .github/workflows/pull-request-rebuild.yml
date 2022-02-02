@@ -18,7 +18,7 @@ jobs:
 
           echo "Event path: $GITHUB_EVENT_PATH"
 
-          pull_number=$(jq --raw-output .pull_request "$GITHUB_EVENT_PATH")
+          pull_number=$(jq --raw-output "$GITHUB_EVENT_PATH")
           echo "PR number is $pull_number"
 
           # Get jira id
